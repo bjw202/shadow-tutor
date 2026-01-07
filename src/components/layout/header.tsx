@@ -19,10 +19,12 @@ export function Header() {
               Upload
             </Button>
           </Link>
-          <Button variant="ghost" size="sm" disabled>
-            <Play className="h-4 w-4 mr-2" />
-            Practice
-          </Button>
+          <Link href="/practice">
+            <Button variant="ghost" size="sm">
+              <Play className="h-4 w-4 mr-2" />
+              Practice
+            </Button>
+          </Link>
           <Button variant="ghost" size="sm" disabled>
             <Settings className="h-4 w-4 mr-2" />
             Settings
