@@ -1,7 +1,8 @@
 ---
 id: SPEC-TTS-001
-version: "1.0.0"
-status: "planned"
+version: "1.1.0"
+status: "implemented"
+updated: "2026-01-07"
 ---
 
 # SPEC-TTS-001: 구현 계획
