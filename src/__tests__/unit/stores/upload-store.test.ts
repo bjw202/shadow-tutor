@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useUploadStore } from "@/stores/upload-store";
-import type { TextSegment, ParseMode } from "@/types";
+import type { TextSegment } from "@/types";
 
 describe("upload-store", () => {
   beforeEach(() => {

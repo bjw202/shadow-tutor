@@ -9,7 +9,7 @@ vi.mock("@/lib/api/tts", () => ({
 }));
 
 // Import mocked functions after vi.mock
-import { generateSpeech, base64ToAudioUrl } from "@/lib/api/tts";
+import { generateSpeech } from "@/lib/api/tts";
 
 // Mock Audio Element
 class MockAudio {

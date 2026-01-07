@@ -40,6 +40,15 @@ describe("Practice Types", () => {
         selectedVoice: "nova",
         audioCache: new Map(),
         error: null,
+        mode: "continuous",
+        shadowingSettings: {
+          pauseDuration: 5,
+          repeatCount: 1,
+          autoAdvance: true,
+        },
+        currentRepeat: 0,
+        isShadowingPaused: false,
+        remainingTime: 0,
       };
       expect(state.sessionId).toBeNull();
       expect(state.segments).toHaveLength(0);
@@ -50,6 +59,13 @@ describe("Practice Types", () => {
       expect(state.selectedVoice).toBe("nova");
       expect(state.audioCache).toBeInstanceOf(Map);
       expect(state.error).toBeNull();
+      expect(state.mode).toBe("continuous");
+      expect(state.shadowingSettings.pauseDuration).toBe(5);
+      expect(state.shadowingSettings.repeatCount).toBe(1);
+      expect(state.shadowingSettings.autoAdvance).toBe(true);
+      expect(state.currentRepeat).toBe(0);
+      expect(state.isShadowingPaused).toBe(false);
+      expect(state.remainingTime).toBe(0);
     });
 
     it("should create practice state with active session", () => {
@@ -71,6 +87,15 @@ describe("Practice Types", () => {
         selectedVoice: "alloy",
         audioCache,
         error: null,
+        mode: "shadowing",
+        shadowingSettings: {
+          pauseDuration: 10,
+          repeatCount: 3,
+          autoAdvance: false,
+        },
+        currentRepeat: 1,
+        isShadowingPaused: true,
+        remainingTime: 5,
       };
       expect(state.sessionId).toBe("session-1");
       expect(state.segments).toHaveLength(1);
@@ -79,6 +104,12 @@ describe("Practice Types", () => {
       expect(state.volume).toBe(0.8);
       expect(state.selectedVoice).toBe("alloy");
       expect(state.audioCache.get("seg-1")).toBe("base64audiodata");
+      expect(state.mode).toBe("shadowing");
+      expect(state.shadowingSettings.pauseDuration).toBe(10);
+      expect(state.shadowingSettings.repeatCount).toBe(3);
+      expect(state.currentRepeat).toBe(1);
+      expect(state.isShadowingPaused).toBe(true);
+      expect(state.remainingTime).toBe(5);
     });
 
     it("should create practice state with error", () => {
@@ -94,6 +125,15 @@ describe("Practice Types", () => {
         selectedVoice: "nova",
         audioCache: new Map(),
         error: "Failed to load audio",
+        mode: "continuous",
+        shadowingSettings: {
+          pauseDuration: 5,
+          repeatCount: 1,
+          autoAdvance: true,
+        },
+        currentRepeat: 0,
+        isShadowingPaused: false,
+        remainingTime: 0,
       };
       expect(state.error).toBe("Failed to load audio");
     });
@@ -119,6 +159,13 @@ describe("Practice Types", () => {
         setPlaybackState: () => {},
         cacheAudio: () => {},
         setError: () => {},
+        setMode: () => {},
+        updateShadowingSettings: () => {},
+        startPause: () => {},
+        skipPause: () => {},
+        incrementRepeat: () => {},
+        resetRepeat: () => {},
+        setRemainingTime: () => {},
       };
 
       expect(typeof actions.initSession).toBe("function");
@@ -135,6 +182,13 @@ describe("Practice Types", () => {
       expect(typeof actions.setPlaybackState).toBe("function");
       expect(typeof actions.cacheAudio).toBe("function");
       expect(typeof actions.setError).toBe("function");
+      expect(typeof actions.setMode).toBe("function");
+      expect(typeof actions.updateShadowingSettings).toBe("function");
+      expect(typeof actions.startPause).toBe("function");
+      expect(typeof actions.skipPause).toBe("function");
+      expect(typeof actions.incrementRepeat).toBe("function");
+      expect(typeof actions.resetRepeat).toBe("function");
+      expect(typeof actions.setRemainingTime).toBe("function");
     });
   });
 });

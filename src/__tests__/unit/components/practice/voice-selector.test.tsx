@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { VoiceSelector } from "@/components/practice/voice-selector";
-import type { VoiceOption } from "@/types";
 
 describe("VoiceSelector", () => {
   const mockOnChange = vi.fn();

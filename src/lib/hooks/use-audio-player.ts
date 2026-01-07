@@ -71,8 +71,6 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     }
 
     const audio = audioRef.current;
-    audio.playbackRate = playbackSpeed;
-    audio.volume = volume;
 
     const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
     const handleDurationChange = () => setDuration(audio.duration);

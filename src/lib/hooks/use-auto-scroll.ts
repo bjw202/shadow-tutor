@@ -18,10 +18,12 @@ interface UseAutoScrollReturn {
 const DEFAULT_RE_ENABLE_DELAY = 3000;
 
 export function useAutoScroll({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   currentIndex,
   enabled,
   reEnableDelay = DEFAULT_RE_ENABLE_DELAY,
 }: UseAutoScrollOptions): UseAutoScrollReturn {
+  // Note: currentIndex is reserved for future use (e.g., scrolling to specific items)
   const containerRef = useRef<HTMLElement | null>(null);
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(enabled);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);

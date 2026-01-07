@@ -4,7 +4,6 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MIN_SPEED, MAX_SPEED } from "@/lib/constants/voices";
-import { cn } from "@/lib/utils";
 
 interface PlaybackSpeedProps {
   value: number;

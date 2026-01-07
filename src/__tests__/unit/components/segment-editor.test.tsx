@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { SegmentEditor } from "@/components/upload/segment-editor";
-import type { ParseMode } from "@/types";
 
 describe("SegmentEditor", () => {
   const mockOnParseModeChange = vi.fn();

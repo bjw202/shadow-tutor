@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { parseText, generateSegmentId } from "@/lib/utils/text-parser";
-import type { ParseMode, TextSegment } from "@/types";
 
 describe("text-parser", () => {
   describe("generateSegmentId", () => {
