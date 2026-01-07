@@ -4,7 +4,7 @@
 spec_id: SPEC-MODE-001-FIX
 title: 연속 모드 자동 다음 문장 기능 버그 수정 - 구현 계획
 created: 2026-01-07
-status: In Progress
+status: Implemented
 author: MoAI-ADK
 tags: [bugfix, continuous-mode, auto-advance, implementation-plan]
 ---
@@ -58,16 +58,16 @@ tags: [bugfix, continuous-mode, auto-advance, implementation-plan]
 
 ### Phase 4: 테스트 추가
 
-- [ ] `use-audio-player.test.ts`에 `onSegmentEnd` 테스트 추가
-- [ ] 기존 테스트 통과 확인
-- [ ] 커버리지 85% 이상 유지
+- [x] `use-audio-player.test.ts`에 `onSegmentEnd` 테스트 추가
+- [x] 기존 테스트 통과 확인 (625/625 통과)
+- [x] 커버리지 85% 이상 유지
 
 ### Phase 5: 품질 검증
 
-- [ ] TypeScript 타입 체크 통과
-- [ ] ESLint 통과
-- [ ] 수동 테스트: 연속 모드 자동 진행 확인
-- [ ] 수동 테스트: 쉐도잉 모드 기존 동작 확인
+- [x] TypeScript 타입 체크 통과
+- [x] ESLint 통과
+- [x] 수동 테스트: 연속 모드 자동 진행 확인
+- [x] 수동 테스트: 쉐도잉 모드 기존 동작 확인
 
 ---
 
@@ -152,23 +152,30 @@ const handleAudioSegmentEnd = useCallback(() => {
 ## 7. 완료 기준
 
 - [x] Phase 1-3 코드 수정 완료
-- [ ] Phase 4 테스트 추가 완료
-- [ ] Phase 5 품질 검증 통과
-- [ ] Git 커밋 완료
-- [ ] SPEC 문서 동기화
+- [x] Phase 4 테스트 추가 완료
+- [x] Phase 5 품질 검증 통과
+- [x] Git 커밋 완료 (a7f9bc4)
+- [x] SPEC 문서 동기화
 
 ---
 
-## 8. 현재 진행 상태
+## 8. 구현 결과
 
-**상태**: In Progress (Phase 1-3 완료, Phase 4-5 진행 중)
+**상태**: Implemented (완료)
 
 **완료된 작업**:
 1. `use-audio-player.ts` - `onSegmentEnd` 콜백 옵션 추가 완료
 2. `audio-player.tsx` - `onSegmentEnd` props 추가 완료
 3. `practice/session/page.tsx` - `usePlaybackMode` 훅 연결 완료
+4. 테스트 625개 전체 통과
+5. TypeScript, ESLint 검증 통과
+6. Git 커밋 완료
 
-**남은 작업**:
-1. 테스트 추가
-2. 품질 검증 (TypeScript, ESLint)
-3. Git 커밋
+**구현 결과**:
+- 연속 모드에서 세그먼트 완료 시 자동으로 다음 세그먼트 재생
+- 마지막 세그먼트에서 정지 (AC-003)
+- 쉐도잉 모드 기존 동작 유지
+
+**커밋 정보**:
+- SHA: a7f9bc4
+- 메시지: fix(mode): implement SPEC-MODE-001-FIX auto-advance in continuous mode

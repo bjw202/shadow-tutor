@@ -4,7 +4,7 @@
 spec_id: SPEC-MODE-001-FIX
 title: 연속 모드 자동 다음 문장 기능 버그 수정 - 인수 기준
 created: 2026-01-07
-status: In Progress
+status: Implemented
 author: MoAI-ADK
 tags: [bugfix, continuous-mode, auto-advance, acceptance-criteria]
 ---
@@ -122,20 +122,20 @@ Feature: 하위 호환성
 
 ### 5.1 코드 품질
 
-- [ ] TypeScript strict 모드 오류 0개
-- [ ] ESLint 오류 0개
-- [ ] 테스트 커버리지 85% 이상 유지
+- [x] TypeScript strict 모드 오류 0개
+- [x] ESLint 오류 0개
+- [x] 테스트 커버리지 85% 이상 유지 (625/625 테스트 통과)
 
 ### 5.2 기능 검증
 
-- [ ] 연속 모드 자동 진행 동작 확인
-- [ ] 마지막 세그먼트 정지 동작 확인
-- [ ] 쉐도잉 모드 기존 동작 유지 확인
+- [x] 연속 모드 자동 진행 동작 확인
+- [x] 마지막 세그먼트 정지 동작 확인
+- [x] 쉐도잉 모드 기존 동작 유지 확인
 
 ### 5.3 하위 호환성
 
-- [ ] 기존 테스트 전체 통과
-- [ ] 기존 코드 변경 없이 동작
+- [x] 기존 테스트 전체 통과
+- [x] 기존 코드 변경 없이 동작
 
 ---
 

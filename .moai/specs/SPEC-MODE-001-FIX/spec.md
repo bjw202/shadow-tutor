@@ -4,7 +4,7 @@
 spec_id: SPEC-MODE-001-FIX
 title: 연속 모드 자동 다음 문장 기능 버그 수정
 created: 2026-01-07
-status: In Progress
+status: Implemented
 priority: high
 author: MoAI-ADK
 lifecycle: bug-fix
