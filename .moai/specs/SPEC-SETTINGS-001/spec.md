@@ -3,9 +3,10 @@
 ---
 id: SPEC-SETTINGS-001
 version: 1.0.0
-status: draft
+status: completed
 created: 2026-01-07
 updated: 2026-01-07
+completed: 2026-01-07
 author: workflow-spec
 priority: high
 tags: [settings, preferences, tts, shadowing, mobile-first]
@@ -17,6 +18,7 @@ lifecycle: spec-anchored
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0.0 | 2026-01-07 | workflow-spec | Initial SPEC creation |
+| 1.0.1 | 2026-01-07 | manager-docs | Implementation completed, status updated |
 
 ---
 

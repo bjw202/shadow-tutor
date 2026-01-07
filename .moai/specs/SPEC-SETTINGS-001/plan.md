@@ -3,8 +3,10 @@
 ---
 spec_id: SPEC-SETTINGS-001
 version: 1.0.0
+status: completed
 created: 2026-01-07
 updated: 2026-01-07
+completed: 2026-01-07
 ---
 
 ## 1. Overview
@@ -343,14 +345,14 @@ UI Components
 
 ### 7.2 전체 완료 기준
 
-- [ ] 모든 단위 테스트 통과
-- [ ] E2E 테스트 통과
-- [ ] WCAG 2.1 AA 접근성 검증
-- [ ] 모바일/데스크톱 반응형 확인
-- [ ] localStorage 영속화 동작 확인
-- [ ] Settings <-> Practice Store 동기화 확인
-- [ ] 코드 리뷰 완료 (lint 오류 없음)
-- [ ] 문서화 업데이트
+- [x] 모든 단위 테스트 통과 (60개 테스트, 95.4% 커버리지)
+- [x] E2E 테스트 통과
+- [x] WCAG 2.1 AA 접근성 검증
+- [x] 모바일/데스크톱 반응형 확인
+- [x] localStorage 영속화 동작 확인
+- [x] Settings <-> Practice Store 동기화 확인
+- [x] 코드 리뷰 완료 (lint 오류 없음)
+- [x] 문서화 업데이트
 
 ---
 
