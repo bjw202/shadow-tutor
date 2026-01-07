@@ -31,10 +31,14 @@ export interface PracticeState {
   playbackSpeed: number;
   /** Volume level (0.0 to 1.0) */
   volume: number;
+  /** Whether audio is muted */
+  isMuted: boolean;
   /** Currently selected TTS voice */
   selectedVoice: VoiceOption;
   /** Cache of audio data by segment ID */
   audioCache: Map<string, string>;
+  /** Whether auto-scroll is enabled for segment list */
+  isAutoScrollEnabled: boolean;
   /** Error message, null if no error */
   error: string | null;
 }
@@ -63,12 +67,16 @@ export interface PracticeActions {
   setPlaybackSpeed: (speed: number) => void;
   /** Set volume level */
   setVolume: (volume: number) => void;
+  /** Toggle mute state */
+  toggleMute: () => void;
   /** Set the TTS voice */
   setVoice: (voice: VoiceOption) => void;
   /** Set the playback state */
   setPlaybackState: (state: PlaybackState) => void;
   /** Cache audio data for a segment */
   cacheAudio: (segmentId: string, audioData: string) => void;
+  /** Set auto-scroll enabled state */
+  setAutoScrollEnabled: (enabled: boolean) => void;
   /** Set or clear error message */
   setError: (error: string | null) => void;
 }

@@ -115,6 +115,7 @@ describe("useAudioPlayer", () => {
       expect(typeof result.current.goToSegment).toBe("function");
       expect(typeof result.current.setPlaybackRate).toBe("function");
       expect(typeof result.current.setVolume).toBe("function");
+      expect(typeof result.current.seekTo).toBe("function");
     });
 
     it("should return current segment when segments exist", () => {
@@ -688,6 +689,95 @@ describe("useAudioPlayer", () => {
       await waitFor(() => {
         expect(result.current.error).toBe("Failed to play audio");
       });
+    });
+  });
+
+  describe("seekTo()", () => {
+    beforeEach(() => {
+      usePracticeStore.getState().initSession([
+        { id: "seg-1", text: "Hello world", startPosition: 0, endPosition: 11 },
+      ]);
+
+      vi.mocked(generateSpeech).mockResolvedValue({
+        audioData: "mock-base64-audio-data",
+        contentType: "audio/mpeg",
+      });
+    });
+
+    it("should seek to specific time position", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      await act(async () => {
+        await result.current.play();
+      });
+
+      act(() => {
+        result.current.seekTo(30);
+      });
+
+      expect(mockAudioInstance.currentTime).toBe(30);
+    });
+
+    it("should not seek to negative time", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      await act(async () => {
+        await result.current.play();
+      });
+
+      mockAudioInstance.currentTime = 10;
+
+      act(() => {
+        result.current.seekTo(-5);
+      });
+
+      expect(mockAudioInstance.currentTime).toBe(0);
+    });
+
+    it("should not seek beyond duration", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      await act(async () => {
+        await result.current.play();
+      });
+
+      mockAudioInstance.duration = 60;
+
+      act(() => {
+        result.current.seekTo(100);
+      });
+
+      expect(mockAudioInstance.currentTime).toBe(60);
+    });
+
+    it("should clamp time to valid range", async () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      await act(async () => {
+        await result.current.play();
+      });
+
+      mockAudioInstance.duration = 120;
+
+      act(() => {
+        result.current.seekTo(45);
+      });
+
+      expect(mockAudioInstance.currentTime).toBe(45);
+    });
+
+    it("should handle seek when duration is 0 (no audio loaded)", () => {
+      const { result } = renderHook(() => useAudioPlayer());
+
+      // When duration is 0, seekTo should clamp to 0
+      mockAudioInstance.duration = 0;
+
+      act(() => {
+        result.current.seekTo(30);
+      });
+
+      // Should clamp to 0 since duration is 0
+      expect(mockAudioInstance.currentTime).toBe(0);
     });
   });
 

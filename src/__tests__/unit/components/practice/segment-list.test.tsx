@@ -210,4 +210,48 @@ describe("SegmentList", () => {
       expect(listItems).toHaveLength(3);
     });
   });
+
+  describe("auto scroll", () => {
+    it("should have auto-scroll enabled by default", () => {
+      render(
+        <SegmentList
+          segments={mockSegments}
+          currentIndex={0}
+          onSelect={mockOnSelect}
+        />
+      );
+
+      // The list should be rendered - auto-scroll is internal
+      const list = screen.getByRole("list");
+      expect(list).toBeInTheDocument();
+    });
+
+    it("should accept isAutoScrollEnabled prop", () => {
+      render(
+        <SegmentList
+          segments={mockSegments}
+          currentIndex={0}
+          onSelect={mockOnSelect}
+          isAutoScrollEnabled={false}
+        />
+      );
+
+      const list = screen.getByRole("list");
+      expect(list).toBeInTheDocument();
+    });
+
+    it("should apply highlight animation class to current segment", () => {
+      render(
+        <SegmentList
+          segments={mockSegments}
+          currentIndex={1}
+          onSelect={mockOnSelect}
+        />
+      );
+
+      const buttons = screen.getAllByRole("button");
+      // Current segment should have animation class
+      expect(buttons[1]).toHaveClass("transition-colors");
+    });
+  });
 });

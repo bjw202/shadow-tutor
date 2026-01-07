@@ -4,6 +4,9 @@ import { Play, Pause, Square, SkipBack, SkipForward, Loader2 } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAudioPlayer } from "@/lib/hooks/use-audio-player";
+import { usePracticeStore } from "@/stores/practice-store";
+import { ProgressBar } from "./progress-bar";
+import { VolumeControl } from "./volume-control";
 import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
@@ -14,6 +17,8 @@ export function AudioPlayer({ className }: AudioPlayerProps) {
   const {
     isPlaying,
     isLoading,
+    currentTime,
+    duration,
     currentSegment,
     currentIndex,
     totalSegments,
@@ -22,7 +27,10 @@ export function AudioPlayer({ className }: AudioPlayerProps) {
     stop,
     nextSegment,
     previousSegment,
+    seekTo,
   } = useAudioPlayer();
+
+  const { volume, isMuted, setVolume, toggleMute } = usePracticeStore();
 
   const isFirstSegment = currentIndex === 0;
   const isLastSegment = currentIndex === totalSegments - 1;
@@ -41,6 +49,15 @@ export function AudioPlayer({ className }: AudioPlayerProps) {
             <p className="text-muted-foreground">No segment selected</p>
           )}
         </div>
+
+        {/* Progress bar */}
+        <ProgressBar
+          currentTime={currentTime}
+          duration={duration}
+          isLoading={isLoading}
+          onSeek={seekTo}
+          className="mb-4"
+        />
 
         {/* Playback controls */}
         <div className="flex items-center justify-center gap-2">
@@ -94,6 +111,15 @@ export function AudioPlayer({ className }: AudioPlayerProps) {
           >
             <SkipForward className="h-4 w-4" />
           </Button>
+
+          {/* Volume control (hidden on mobile) */}
+          <VolumeControl
+            volume={volume}
+            isMuted={isMuted}
+            onVolumeChange={setVolume}
+            onMuteToggle={toggleMute}
+            className="ml-4"
+          />
         </div>
 
         {/* Progress indicator */}

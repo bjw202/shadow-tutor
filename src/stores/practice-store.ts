@@ -17,8 +17,10 @@ const initialState: PracticeState = {
   playbackState: "idle",
   playbackSpeed: DEFAULT_SPEED,
   volume: DEFAULT_VOLUME,
+  isMuted: false,
   selectedVoice: DEFAULT_VOICE,
   audioCache: new Map(),
+  isAutoScrollEnabled: true,
   error: null,
 };
 
@@ -43,8 +45,10 @@ export const usePracticeStore = create<PracticeStore>((set, get) => ({
       playbackState: "idle",
       playbackSpeed: DEFAULT_SPEED,
       volume: DEFAULT_VOLUME,
+      isMuted: false,
       selectedVoice: DEFAULT_VOICE,
       audioCache: new Map(),
+      isAutoScrollEnabled: true,
       error: null,
     }),
 
@@ -87,6 +91,11 @@ export const usePracticeStore = create<PracticeStore>((set, get) => ({
     }
   },
 
+  toggleMute: () => {
+    const { isMuted } = get();
+    set({ isMuted: !isMuted });
+  },
+
   setVoice: (voice: VoiceOption) =>
     set({
       selectedVoice: voice,
@@ -101,6 +110,8 @@ export const usePracticeStore = create<PracticeStore>((set, get) => ({
     newCache.set(segmentId, audioData);
     set({ audioCache: newCache });
   },
+
+  setAutoScrollEnabled: (enabled: boolean) => set({ isAutoScrollEnabled: enabled }),
 
   setError: (error: string | null) => set({ error }),
 }));

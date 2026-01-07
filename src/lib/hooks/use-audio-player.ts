@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePracticeStore } from "@/stores/practice-store";
 import { generateSpeech, base64ToAudioUrl } from "@/lib/api/tts";
 
@@ -26,6 +26,7 @@ export interface UseAudioPlayerReturn {
   nextSegment: () => Promise<void>;
   previousSegment: () => Promise<void>;
   goToSegment: (index: number) => Promise<void>;
+  seekTo: (time: number) => void;
 
   // Settings
   setPlaybackRate: (rate: number) => void;
@@ -55,9 +56,13 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     goToSegment: storeGoToSegment,
   } = usePracticeStore();
 
-  const currentSegment = segments[currentSegmentIndex]
-    ? { id: segments[currentSegmentIndex].id, text: segments[currentSegmentIndex].text }
-    : null;
+  const currentSegment = useMemo(
+    () =>
+      segments[currentSegmentIndex]
+        ? { id: segments[currentSegmentIndex].id, text: segments[currentSegmentIndex].text }
+        : null,
+    [segments, currentSegmentIndex]
+  );
 
   // Initialize audio element and set up event listeners
   useEffect(() => {
@@ -252,6 +257,15 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     usePracticeStore.getState().setVolume(vol);
   }, []);
 
+  const seekTo = useCallback((time: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Clamp time to valid range [0, duration]
+    const clampedTime = Math.max(0, Math.min(time, audio.duration || 0));
+    audio.currentTime = clampedTime;
+  }, []);
+
   return {
     isPlaying: playbackState === "playing",
     isLoading: playbackState === "loading",
@@ -269,6 +283,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     nextSegment,
     previousSegment,
     goToSegment,
+    seekTo,
     setPlaybackRate,
     setVolume: setVolumeValue,
   };

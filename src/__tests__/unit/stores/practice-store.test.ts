@@ -380,4 +380,50 @@ describe("practice-store", () => {
       expect(usePracticeStore.getState().error).toBeNull();
     });
   });
+
+  describe("isMuted state", () => {
+    it("should have initial isMuted value as false", () => {
+      expect(usePracticeStore.getState().isMuted).toBe(false);
+    });
+
+    it("should toggle mute state", () => {
+      expect(usePracticeStore.getState().isMuted).toBe(false);
+
+      usePracticeStore.getState().toggleMute();
+      expect(usePracticeStore.getState().isMuted).toBe(true);
+
+      usePracticeStore.getState().toggleMute();
+      expect(usePracticeStore.getState().isMuted).toBe(false);
+    });
+
+    it("should reset isMuted on clearSession", () => {
+      usePracticeStore.getState().toggleMute();
+      expect(usePracticeStore.getState().isMuted).toBe(true);
+
+      usePracticeStore.getState().clearSession();
+      expect(usePracticeStore.getState().isMuted).toBe(false);
+    });
+  });
+
+  describe("isAutoScrollEnabled state", () => {
+    it("should have initial isAutoScrollEnabled value as true", () => {
+      expect(usePracticeStore.getState().isAutoScrollEnabled).toBe(true);
+    });
+
+    it("should set auto scroll enabled state", () => {
+      usePracticeStore.getState().setAutoScrollEnabled(false);
+      expect(usePracticeStore.getState().isAutoScrollEnabled).toBe(false);
+
+      usePracticeStore.getState().setAutoScrollEnabled(true);
+      expect(usePracticeStore.getState().isAutoScrollEnabled).toBe(true);
+    });
+
+    it("should reset isAutoScrollEnabled on clearSession", () => {
+      usePracticeStore.getState().setAutoScrollEnabled(false);
+      expect(usePracticeStore.getState().isAutoScrollEnabled).toBe(false);
+
+      usePracticeStore.getState().clearSession();
+      expect(usePracticeStore.getState().isAutoScrollEnabled).toBe(true);
+    });
+  });
 });
