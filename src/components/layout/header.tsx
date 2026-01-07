@@ -25,10 +25,12 @@ export function Header() {
               Practice
             </Button>
           </Link>
-          <Button variant="ghost" size="sm" disabled>
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </Button>
+          <Link href="/settings">
+            <Button variant="ghost" size="sm">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+          </Link>
         </nav>
       </div>
     </header>
