@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -12,6 +12,7 @@ import {
   VoiceSelector,
 } from "@/components/practice";
 import { useAudioPlayer } from "@/lib/hooks/use-audio-player";
+import { usePlaybackMode } from "@/lib/hooks/use-playback-mode";
 import { usePracticeStore } from "@/stores/practice-store";
 import type { VoiceOption } from "@/types";
 
@@ -20,7 +21,26 @@ export default function PracticeSessionPage() {
   const { segments, sessionId, playbackSpeed, selectedVoice, clearSession } =
     usePracticeStore();
 
-  const { currentIndex, goToSegment, setPlaybackRate } = useAudioPlayer();
+  const { currentIndex, goToSegment, setPlaybackRate, play, nextSegment } =
+    useAudioPlayer();
+  const { handleSegmentEnd } = usePlaybackMode();
+
+  // Handle automatic segment advancement based on playback mode
+  const handleAudioSegmentEnd = useCallback(() => {
+    const totalSegments = segments.length;
+    const isLastSegment = currentIndex >= totalSegments - 1;
+
+    // Don't auto-advance on last segment (AC-003)
+    if (isLastSegment) {
+      return;
+    }
+
+    // Use playback mode logic to determine next action
+    handleSegmentEnd(
+      () => nextSegment(), // onAdvance - go to next segment
+      () => play() // onRepeat - replay current segment (for shadowing mode)
+    );
+  }, [currentIndex, segments.length, handleSegmentEnd, nextSegment, play]);
 
   // Redirect to practice page if no session
   useEffect(() => {
@@ -60,7 +80,7 @@ export default function PracticeSessionPage() {
       <div className="grid gap-6 md:grid-cols-3">
         {/* Main content - Audio Player */}
         <div className="space-y-6 md:col-span-2">
-          <AudioPlayer />
+          <AudioPlayer onSegmentEnd={handleAudioSegmentEnd} />
 
           {/* Settings row */}
           <div className="grid gap-4 sm:grid-cols-2">

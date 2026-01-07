@@ -11,9 +11,11 @@ import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
   className?: string;
+  /** Callback when segment playback ends */
+  onSegmentEnd?: () => void;
 }
 
-export function AudioPlayer({ className }: AudioPlayerProps) {
+export function AudioPlayer({ className, onSegmentEnd }: AudioPlayerProps) {
   const {
     isPlaying,
     isLoading,
@@ -28,7 +30,7 @@ export function AudioPlayer({ className }: AudioPlayerProps) {
     nextSegment,
     previousSegment,
     seekTo,
-  } = useAudioPlayer();
+  } = useAudioPlayer({ onSegmentEnd });
 
   const { volume, isMuted, setVolume, toggleMute } = usePracticeStore();
 

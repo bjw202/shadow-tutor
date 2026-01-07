@@ -4,6 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePracticeStore } from "@/stores/practice-store";
 import { generateSpeech, base64ToAudioUrl } from "@/lib/api/tts";
 
+export interface UseAudioPlayerOptions {
+  /** Callback when segment playback ends */
+  onSegmentEnd?: () => void;
+}
+
 export interface UseAudioPlayerReturn {
   // State
   isPlaying: boolean;
@@ -33,7 +38,11 @@ export interface UseAudioPlayerReturn {
   setVolume: (volume: number) => void;
 }
 
-export function useAudioPlayer(): UseAudioPlayerReturn {
+export function useAudioPlayer(
+  options?: UseAudioPlayerOptions
+): UseAudioPlayerReturn {
+  const { onSegmentEnd } = options ?? {};
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -64,6 +73,12 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     [segments, currentSegmentIndex]
   );
 
+  // Store onSegmentEnd in a ref to avoid re-creating event listeners
+  const onSegmentEndRef = useRef(onSegmentEnd);
+  useEffect(() => {
+    onSegmentEndRef.current = onSegmentEnd;
+  }, [onSegmentEnd]);
+
   // Initialize audio element and set up event listeners
   useEffect(() => {
     if (!audioRef.current) {
@@ -74,7 +89,11 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
 
     const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
     const handleDurationChange = () => setDuration(audio.duration);
-    const handleEnded = () => setPlaybackState("stopped");
+    const handleEnded = () => {
+      setPlaybackState("stopped");
+      // Call onSegmentEnd callback if provided
+      onSegmentEndRef.current?.();
+    };
     const handleError = () => setLocalError("Failed to play audio");
 
     audio.addEventListener("timeupdate", handleTimeUpdate);
