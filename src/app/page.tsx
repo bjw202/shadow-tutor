@@ -59,10 +59,12 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="secondary" className="w-full">
-                  <Play className="mr-2 h-4 w-4" />
-                  Start Practice
-                </Button>
+                <Link href="/practice">
+                  <Button variant="secondary" className="w-full">
+                    <Play className="mr-2 h-4 w-4" />
+                    Start Practice
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -75,10 +77,12 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Button>
+                <Link href="/settings">
+                  <Button variant="outline" className="w-full">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </section>

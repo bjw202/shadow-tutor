@@ -1,9 +1,11 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import { Play, Pause, Square, SkipBack, SkipForward, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAudioPlayer } from "@/lib/hooks/use-audio-player";
+import { usePlaybackMode } from "@/lib/hooks/use-playback-mode";
 import { usePracticeStore } from "@/stores/practice-store";
 import { ProgressBar } from "./progress-bar";
 import { VolumeControl } from "./volume-control";
@@ -11,11 +13,38 @@ import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
   className?: string;
-  /** Callback when segment playback ends */
-  onSegmentEnd?: () => void;
+  /** Callback to expose goToSegment function to parent */
+  onReady?: (actions: { goToSegment: (index: number) => Promise<void> }) => void;
 }
 
-export function AudioPlayer({ className, onSegmentEnd }: AudioPlayerProps) {
+export function AudioPlayer({ className, onReady }: AudioPlayerProps) {
+  const { handleSegmentEnd } = usePlaybackMode();
+  const segments = usePracticeStore((state) => state.segments);
+
+  // Refs to hold latest values for the callback
+  const actionsRef = useRef<{
+    nextSegment: () => Promise<void>;
+    play: () => Promise<void>;
+  } | null>(null);
+  const currentIndexRef = useRef(0);
+
+  // Internal segment end handler - uses refs to avoid stale closures
+  const handleInternalSegmentEnd = useCallback(() => {
+    const totalSegments = segments.length;
+    const isLastSegment = currentIndexRef.current >= totalSegments - 1;
+
+    // Don't auto-advance on last segment (AC-003)
+    if (isLastSegment) {
+      return;
+    }
+
+    // Use playback mode logic to determine next action
+    handleSegmentEnd(
+      () => actionsRef.current?.nextSegment(), // onAdvance - go to next segment
+      () => actionsRef.current?.play() // onRepeat - replay current segment
+    );
+  }, [segments.length, handleSegmentEnd]);
+
   const {
     isPlaying,
     isLoading,
@@ -29,8 +58,24 @@ export function AudioPlayer({ className, onSegmentEnd }: AudioPlayerProps) {
     stop,
     nextSegment,
     previousSegment,
+    goToSegment,
     seekTo,
-  } = useAudioPlayer({ onSegmentEnd });
+    play,
+  } = useAudioPlayer({ onSegmentEnd: handleInternalSegmentEnd });
+
+  // Keep refs updated with latest functions
+  useEffect(() => {
+    actionsRef.current = { nextSegment, play };
+  }, [nextSegment, play]);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  // Expose goToSegment to parent component
+  useEffect(() => {
+    onReady?.({ goToSegment });
+  }, [goToSegment, onReady]);
 
   const { volume, isMuted, setVolume, toggleMute } = usePracticeStore();
 
