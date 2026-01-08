@@ -24,7 +24,7 @@ describe("Audio Types", () => {
       expect(states).toContain("playing");
       expect(states).toContain("paused");
       expect(states).toContain("stopped");
-    });
+    }); 
   });
 
   describe("VoiceOption", () => {

@@ -4,6 +4,8 @@ export type {
   ParseMode,
   UploadStatus,
   UploadState,
+  InputMethod,
+  TextInputState,
 } from "./upload";
 export type {
   PlaybackState,

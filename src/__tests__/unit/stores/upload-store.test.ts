@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useUploadStore } from "@/stores/upload-store";
-import type { TextSegment } from "@/types";
+import type { TextSegment, TextInputState } from "@/types";
 
 describe("upload-store", () => {
   beforeEach(() => {
@@ -19,6 +19,21 @@ describe("upload-store", () => {
       expect(state.error).toBeNull();
       expect(state.progress).toBe(0);
       expect(state.parseMode).toBe("sentence");
+    });
+
+    it("should have inputMethod default to file", () => {
+      const state = useUploadStore.getState();
+      expect(state.inputMethod).toBe("file");
+    });
+
+    it("should have textInput with default values", () => {
+      const state = useUploadStore.getState();
+      expect(state.textInput).toEqual({
+        text: "",
+        charCount: 0,
+        isValid: false,
+        validationError: null,
+      });
     });
   });
 
@@ -221,6 +236,212 @@ describe("upload-store", () => {
       expect(state.error).toBeNull();
       expect(state.progress).toBe(0);
       expect(state.parseMode).toBe("sentence");
+    });
+
+    it("should reset inputMethod and textInput", () => {
+      useUploadStore.getState().setInputMethod("text");
+      useUploadStore.getState().setTextInput({
+        text: "Some text",
+        charCount: 9,
+        isValid: true,
+        validationError: null,
+      });
+
+      useUploadStore.getState().reset();
+
+      const state = useUploadStore.getState();
+      expect(state.inputMethod).toBe("file");
+      expect(state.textInput).toEqual({
+        text: "",
+        charCount: 0,
+        isValid: false,
+        validationError: null,
+      });
+    });
+  });
+
+  describe("setInputMethod", () => {
+    it("should update input method to text", () => {
+      useUploadStore.getState().setInputMethod("text");
+
+      expect(useUploadStore.getState().inputMethod).toBe("text");
+    });
+
+    it("should update input method back to file", () => {
+      useUploadStore.getState().setInputMethod("text");
+      useUploadStore.getState().setInputMethod("file");
+
+      expect(useUploadStore.getState().inputMethod).toBe("file");
+    });
+  });
+
+  describe("setTextInput", () => {
+    it("should update text input state", () => {
+      const textInput: TextInputState = {
+        text: "Hello, world!",
+        charCount: 13,
+        isValid: true,
+        validationError: null,
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput).toEqual(textInput);
+    });
+
+    it("should update text input with validation error", () => {
+      const textInput: TextInputState = {
+        text: "",
+        charCount: 0,
+        isValid: false,
+        validationError: "Please enter text to practice",
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.validationError).toBe(
+        "Please enter text to practice"
+      );
+    });
+
+    it("should handle Korean text", () => {
+      const koreanText = "안녕하세요. 오늘 날씨가 좋습니다.";
+      const textInput: TextInputState = {
+        text: koreanText,
+        charCount: koreanText.length,
+        isValid: true,
+        validationError: null,
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.text).toBe(koreanText);
+      expect(useUploadStore.getState().textInput.charCount).toBe(19);
+    });
+
+    it("should handle Chinese text", () => {
+      const chineseText = "你好世界！";
+      const textInput: TextInputState = {
+        text: chineseText,
+        charCount: chineseText.length,
+        isValid: true,
+        validationError: null,
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.text).toBe(chineseText);
+      expect(useUploadStore.getState().textInput.charCount).toBe(5);
+    });
+
+    it("should handle Japanese text", () => {
+      const japaneseText = "こんにちは世界！";
+      const textInput: TextInputState = {
+        text: japaneseText,
+        charCount: japaneseText.length,
+        isValid: true,
+        validationError: null,
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.text).toBe(japaneseText);
+      expect(useUploadStore.getState().textInput.charCount).toBe(8);
+    });
+
+    it("should handle maximum character count", () => {
+      const maxText = "a".repeat(10000);
+      const textInput: TextInputState = {
+        text: maxText,
+        charCount: 10000,
+        isValid: true,
+        validationError: null,
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.charCount).toBe(10000);
+      expect(useUploadStore.getState().textInput.isValid).toBe(true);
+    });
+
+    it("should handle over-limit text with validation error", () => {
+      const overText = "a".repeat(10001);
+      const textInput: TextInputState = {
+        text: overText,
+        charCount: 10001,
+        isValid: false,
+        validationError: "Maximum 10,000 characters allowed",
+      };
+
+      useUploadStore.getState().setTextInput(textInput);
+
+      expect(useUploadStore.getState().textInput.isValid).toBe(false);
+      expect(useUploadStore.getState().textInput.validationError).toBe(
+        "Maximum 10,000 characters allowed"
+      );
+    });
+  });
+
+  describe("clearContent", () => {
+    it("should clear file content when input method is file", () => {
+      const mockFile = new File(["test"], "test.txt", { type: "text/plain" });
+      useUploadStore.getState().setFile(mockFile);
+      useUploadStore.getState().setContent("Test content");
+      useUploadStore.getState().setSegments([
+        { id: "1", text: "Test.", startPosition: 0, endPosition: 5 },
+      ]);
+      useUploadStore.getState().setStatus("complete");
+
+      useUploadStore.getState().clearContent();
+
+      const state = useUploadStore.getState();
+      expect(state.file).toBeNull();
+      expect(state.content).toBe("");
+      expect(state.segments).toEqual([]);
+      expect(state.status).toBe("idle");
+      expect(state.progress).toBe(0);
+    });
+
+    it("should clear text input when input method is text", () => {
+      useUploadStore.getState().setInputMethod("text");
+      useUploadStore.getState().setTextInput({
+        text: "Some text",
+        charCount: 9,
+        isValid: true,
+        validationError: null,
+      });
+      useUploadStore.getState().setContent("Some text");
+      useUploadStore.getState().setSegments([
+        { id: "1", text: "Some text.", startPosition: 0, endPosition: 10 },
+      ]);
+      useUploadStore.getState().setStatus("complete");
+
+      useUploadStore.getState().clearContent();
+
+      const state = useUploadStore.getState();
+      expect(state.textInput).toEqual({
+        text: "",
+        charCount: 0,
+        isValid: false,
+        validationError: null,
+      });
+      expect(state.content).toBe("");
+      expect(state.segments).toEqual([]);
+      expect(state.status).toBe("idle");
+    });
+
+    it("should preserve input method when clearing", () => {
+      useUploadStore.getState().setInputMethod("text");
+      useUploadStore.getState().clearContent();
+
+      expect(useUploadStore.getState().inputMethod).toBe("text");
+    });
+
+    it("should clear error when clearing content", () => {
+      useUploadStore.getState().setError("Some error");
+      useUploadStore.getState().clearContent();
+
+      expect(useUploadStore.getState().error).toBeNull();
     });
   });
 });

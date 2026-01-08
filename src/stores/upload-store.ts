@@ -4,7 +4,19 @@ import type {
   ParseMode,
   UploadStatus,
   UploadState,
+  InputMethod,
+  TextInputState,
 } from "@/types";
+
+/**
+ * Default text input state
+ */
+const defaultTextInput: TextInputState = {
+  text: "",
+  charCount: 0,
+  isValid: false,
+  validationError: null,
+};
 
 /**
  * Initial state for the upload store
@@ -18,6 +30,9 @@ const initialState: Omit<
   | "setError"
   | "setProgress"
   | "setParseMode"
+  | "setInputMethod"
+  | "setTextInput"
+  | "clearContent"
   | "reset"
 > = {
   file: null,
@@ -27,6 +42,8 @@ const initialState: Omit<
   error: null,
   progress: 0,
   parseMode: "sentence",
+  inputMethod: "file",
+  textInput: defaultTextInput,
 };
 
 /**
@@ -40,6 +57,9 @@ interface UploadActions {
   setError: (error: string | null) => void;
   setProgress: (progress: number) => void;
   setParseMode: (mode: ParseMode) => void;
+  setInputMethod: (method: InputMethod) => void;
+  setTextInput: (textInput: TextInputState) => void;
+  clearContent: () => void;
   reset: () => void;
 }
 
@@ -71,6 +91,21 @@ export const useUploadStore = create<UploadStore>((set) => ({
   setProgress: (progress) => set({ progress }),
 
   setParseMode: (parseMode) => set({ parseMode }),
+
+  setInputMethod: (inputMethod) => set({ inputMethod }),
+
+  setTextInput: (textInput) => set({ textInput }),
+
+  clearContent: () =>
+    set({
+      file: null,
+      content: "",
+      segments: [],
+      status: "idle",
+      error: null,
+      progress: 0,
+      textInput: defaultTextInput,
+    }),
 
   reset: () => set(initialState),
 }));
