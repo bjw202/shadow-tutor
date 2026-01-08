@@ -142,10 +142,11 @@ export function useAudioPlayer(
 
         if (!audioData) {
           // Generate TTS
+          // SPEC-PLAYBACK-001-FIX: Do not pass speed to TTS API
+          // Speed is controlled client-side via playbackRate to prevent double application
           const response = await generateSpeech({
             text: segment.text,
             voice: selectedVoice,
-            speed: playbackSpeed,
           });
           audioData = response.audioData;
           cacheAudio(segment.id, audioData);

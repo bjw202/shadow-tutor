@@ -26,10 +26,11 @@ describe("PlaybackSpeed", () => {
     it("should render speed preset buttons", () => {
       render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
 
+      // SPEC-PLAYBACK-001-FIX: Updated preset values
       expect(screen.getByRole("button", { name: "0.5x" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "0.75x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "0.8x" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "1x" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "1.25x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "1.2x" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "1.5x" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "2x" })).toBeInTheDocument();
     });
@@ -65,14 +66,15 @@ describe("PlaybackSpeed", () => {
       expect(mockOnChange).toHaveBeenCalledWith(0.5);
     });
 
-    it("should call onChange with 0.75 when 0.75x button clicked", async () => {
+    // SPEC-PLAYBACK-001-FIX: Updated 0.75 -> 0.8
+    it("should call onChange with 0.8 when 0.8x button clicked", async () => {
       const user = userEvent.setup();
 
       render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
 
-      await user.click(screen.getByRole("button", { name: "0.75x" }));
+      await user.click(screen.getByRole("button", { name: "0.8x" }));
 
-      expect(mockOnChange).toHaveBeenCalledWith(0.75);
+      expect(mockOnChange).toHaveBeenCalledWith(0.8);
     });
 
     it("should call onChange with 1.0 when 1x button clicked", async () => {
@@ -85,14 +87,15 @@ describe("PlaybackSpeed", () => {
       expect(mockOnChange).toHaveBeenCalledWith(1.0);
     });
 
-    it("should call onChange with 1.25 when 1.25x button clicked", async () => {
+    // SPEC-PLAYBACK-001-FIX: Updated 1.25 -> 1.2
+    it("should call onChange with 1.2 when 1.2x button clicked", async () => {
       const user = userEvent.setup();
 
       render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
 
-      await user.click(screen.getByRole("button", { name: "1.25x" }));
+      await user.click(screen.getByRole("button", { name: "1.2x" }));
 
-      expect(mockOnChange).toHaveBeenCalledWith(1.25);
+      expect(mockOnChange).toHaveBeenCalledWith(1.2);
     });
 
     it("should call onChange with 1.5 when 1.5x button clicked", async () => {
@@ -175,10 +178,73 @@ describe("PlaybackSpeed", () => {
     });
 
     it("should reflect current value", () => {
-      render(<PlaybackSpeed value={1.25} onChange={mockOnChange} />);
+      render(<PlaybackSpeed value={1.2} onChange={mockOnChange} />);
 
       const slider = screen.getByRole("slider");
-      expect(slider).toHaveAttribute("aria-valuenow", "1.25");
+      expect(slider).toHaveAttribute("aria-valuenow", "1.2");
+    });
+  });
+
+  // SPEC-PLAYBACK-001-FIX: Updated preset values
+  describe("SPEC-PLAYBACK-001-FIX: new preset values", () => {
+    it("should render new preset buttons [0.5, 0.8, 1.0, 1.2, 1.5, 2.0]", () => {
+      render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
+
+      // New presets should exist
+      expect(screen.getByRole("button", { name: "0.5x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "0.8x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "1x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "1.2x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "1.5x" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "2x" })).toBeInTheDocument();
+    });
+
+    it("should NOT render old preset 0.75x button", () => {
+      render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
+
+      // Old 0.75x preset should NOT exist
+      expect(screen.queryByRole("button", { name: "0.75x" })).not.toBeInTheDocument();
+    });
+
+    it("should NOT render old preset 1.25x button", () => {
+      render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
+
+      // Old 1.25x preset should NOT exist
+      expect(screen.queryByRole("button", { name: "1.25x" })).not.toBeInTheDocument();
+    });
+
+    it("should call onChange with 0.8 when 0.8x button clicked", async () => {
+      const user = userEvent.setup();
+
+      render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
+
+      await user.click(screen.getByRole("button", { name: "0.8x" }));
+
+      expect(mockOnChange).toHaveBeenCalledWith(0.8);
+    });
+
+    it("should call onChange with 1.2 when 1.2x button clicked", async () => {
+      const user = userEvent.setup();
+
+      render(<PlaybackSpeed value={1.0} onChange={mockOnChange} />);
+
+      await user.click(screen.getByRole("button", { name: "1.2x" }));
+
+      expect(mockOnChange).toHaveBeenCalledWith(1.2);
+    });
+
+    it("should highlight 0.8x button when value is 0.8", () => {
+      render(<PlaybackSpeed value={0.8} onChange={mockOnChange} />);
+
+      const button = screen.getByRole("button", { name: "0.8x" });
+      expect(button).toHaveClass("bg-primary");
+    });
+
+    it("should highlight 1.2x button when value is 1.2", () => {
+      render(<PlaybackSpeed value={1.2} onChange={mockOnChange} />);
+
+      const button = screen.getByRole("button", { name: "1.2x" });
+      expect(button).toHaveClass("bg-primary");
     });
   });
 });

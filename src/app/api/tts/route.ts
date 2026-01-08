@@ -64,11 +64,13 @@ export async function POST(
     }
 
     // Call OpenAI TTS API
+    // SPEC-PLAYBACK-001-FIX: Always use speed=1.0 to prevent double speed application
+    // Speed adjustment is handled client-side via HTMLAudioElement.playbackRate
     const response = await openai.audio.speech.create({
       model: "tts-1",
       voice: voice,
       input: text,
-      speed,
+      speed: 1.0,
       response_format: "mp3",
     });
 

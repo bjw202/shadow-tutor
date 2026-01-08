@@ -153,10 +153,10 @@ describe("useAudioPlayer", () => {
         await result.current.play();
       });
 
+      // SPEC-PLAYBACK-001-FIX: speed should NOT be passed to generateSpeech
       expect(generateSpeech).toHaveBeenCalledWith({
         text: "Hello world",
         voice: "nova",
-        speed: 1.0,
       });
       expect(mockAudioInstance.play).toHaveBeenCalled();
     });
@@ -795,6 +795,152 @@ describe("useAudioPlayer", () => {
       expect(mockAudioInstance.removeEventListener).toHaveBeenCalledWith("durationchange", expect.any(Function));
       expect(mockAudioInstance.removeEventListener).toHaveBeenCalledWith("ended", expect.any(Function));
       expect(mockAudioInstance.removeEventListener).toHaveBeenCalledWith("error", expect.any(Function));
+    });
+  });
+
+  // SPEC-PLAYBACK-001-FIX: Speed parameter should not be passed to TTS API
+  describe("SPEC-PLAYBACK-001-FIX: TTS API speed handling", () => {
+    beforeEach(() => {
+      usePracticeStore.getState().initSession([
+        { id: "seg-1", text: "Hello world", startPosition: 0, endPosition: 11 },
+      ]);
+
+      vi.mocked(generateSpeech).mockResolvedValue({
+        audioData: "mock-base64-audio-data",
+        contentType: "audio/mpeg",
+      });
+    });
+
+    describe("UB-002: System must not pass user speed to TTS API", () => {
+      it("should NOT pass speed parameter to generateSpeech when playbackSpeed is 1.5", async () => {
+        usePracticeStore.setState({ playbackSpeed: 1.5 });
+
+        const { result } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        // Should be called WITHOUT speed parameter
+        expect(generateSpeech).toHaveBeenCalledWith({
+          text: "Hello world",
+          voice: "nova",
+          // speed should NOT be included
+        });
+
+        // Verify speed is NOT in the call
+        const callArgs = vi.mocked(generateSpeech).mock.calls[0][0];
+        expect(callArgs).not.toHaveProperty("speed");
+      });
+
+      it("should NOT pass speed parameter to generateSpeech when playbackSpeed is 0.5", async () => {
+        usePracticeStore.setState({ playbackSpeed: 0.5 });
+
+        const { result } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        const callArgs = vi.mocked(generateSpeech).mock.calls[0][0];
+        expect(callArgs).not.toHaveProperty("speed");
+      });
+
+      it("should NOT pass speed parameter to generateSpeech when playbackSpeed is 2.0", async () => {
+        usePracticeStore.setState({ playbackSpeed: 2.0 });
+
+        const { result } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        const callArgs = vi.mocked(generateSpeech).mock.calls[0][0];
+        expect(callArgs).not.toHaveProperty("speed");
+      });
+    });
+
+    describe("UR-002: Speed must be applied only via playbackRate", () => {
+      it("should apply playbackSpeed to audio element playbackRate, not TTS API", async () => {
+        usePracticeStore.setState({ playbackSpeed: 1.5 });
+
+        const { result } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        // TTS API should NOT receive speed
+        const callArgs = vi.mocked(generateSpeech).mock.calls[0][0];
+        expect(callArgs).not.toHaveProperty("speed");
+
+        // Audio element should have playbackRate set
+        expect(mockAudioInstance.playbackRate).toBe(1.5);
+      });
+    });
+
+    describe("SD-002: Cache reuse regardless of speed", () => {
+      it("should reuse cached audio when playing same segment at different speed", async () => {
+        // First play at 1.0x speed
+        usePracticeStore.setState({ playbackSpeed: 1.0 });
+        const { result, rerender } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        expect(generateSpeech).toHaveBeenCalledTimes(1);
+        const cache = usePracticeStore.getState().audioCache;
+        expect(cache.get("seg-1")).toBe("mock-base64-audio-data");
+
+        // Clear mocks
+        vi.clearAllMocks();
+
+        // Change speed to 1.5x and stop/play again
+        act(() => {
+          result.current.stop();
+        });
+
+        usePracticeStore.setState({ playbackSpeed: 1.5 });
+        rerender();
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        // Should NOT call generateSpeech again - should use cache
+        expect(generateSpeech).not.toHaveBeenCalled();
+        // But playbackRate should be updated
+        expect(mockAudioInstance.playbackRate).toBe(1.5);
+      });
+    });
+
+    describe("UB-003: System must not regenerate audio on speed change", () => {
+      it("should not call generateSpeech when speed changes during playback", async () => {
+        const { result } = renderHook(() => useAudioPlayer());
+
+        await act(async () => {
+          await result.current.play();
+        });
+
+        expect(generateSpeech).toHaveBeenCalledTimes(1);
+
+        // Clear mocks
+        vi.clearAllMocks();
+
+        // Change playback speed
+        act(() => {
+          result.current.setPlaybackRate(1.5);
+        });
+
+        // Should NOT call generateSpeech again
+        expect(generateSpeech).not.toHaveBeenCalled();
+
+        // Only playbackRate should be updated
+        await waitFor(() => {
+          expect(mockAudioInstance.playbackRate).toBe(1.5);
+        });
+      });
     });
   });
 });

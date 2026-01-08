@@ -11,7 +11,9 @@ interface PlaybackSpeedProps {
   className?: string;
 }
 
-const SPEED_PRESETS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+// SPEC-PLAYBACK-001-FIX: Updated presets with more intuitive values
+// Changed 0.75 -> 0.8 (20% slower) and 1.25 -> 1.2 (20% faster)
+const SPEED_PRESETS = [0.5, 0.8, 1.0, 1.2, 1.5, 2.0];
 
 export function PlaybackSpeed({ value, onChange, className }: PlaybackSpeedProps) {
   const handleSliderChange = (values: number[]) => {
