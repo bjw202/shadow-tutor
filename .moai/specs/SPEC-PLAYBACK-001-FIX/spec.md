@@ -1,9 +1,9 @@
 ---
 id: SPEC-PLAYBACK-001-FIX
 version: "1.1.0"
-status: "draft"
+status: "completed"
 created: "2026-01-08"
-updated: "2026-01-08"
+updated: "2026-01-09"
 author: "MoAI-ADK"
 priority: "high"
 lifecycle: "spec-first"
@@ -21,6 +21,7 @@ related_specs:
 |------|------|--------|-----------|
 | 1.0.0 | 2026-01-08 | MoAI-ADK | 초기 SPEC 생성 |
 | 1.1.0 | 2026-01-08 | MoAI-ADK | UI Enhancement 범위 추가 (프리셋 버튼 변경) |
+| 1.2.0 | 2026-01-09 | MoAI-ADK | 구현 완료 - TTS API speed:1.0 고정, 프리셋 [0.5,0.8,1.0,1.2,1.5,2.0] 적용 |
 
 ---
 
