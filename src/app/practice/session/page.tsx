@@ -12,6 +12,7 @@ import {
   VoiceSelector,
 } from "@/components/practice";
 import { usePracticeStore } from "@/stores/practice-store";
+import { useSettingsStore } from "@/stores/settings-store";
 import { useSettingsSync } from "@/lib/hooks/use-settings-sync";
 import type { VoiceOption } from "@/types";
 
@@ -61,8 +62,17 @@ export default function PracticeSessionPage() {
     router.push("/practice");
   };
 
+  // SPEC-PLAYBACK-001-FIX: Update both stores to prevent sync hook from reverting the value
+  const handleSpeedChange = (speed: number) => {
+    usePracticeStore.getState().setPlaybackSpeed(speed);
+    useSettingsStore.getState().setSpeed(speed);
+  };
+
+  // SPEC-REPEAT-001-FIX: Update both stores to prevent sync hook from reverting the value
   const handleVoiceChange = (voice: string) => {
-    usePracticeStore.getState().setVoice(voice as VoiceOption);
+    const voiceOption = voice as VoiceOption;
+    usePracticeStore.getState().setVoice(voiceOption);
+    useSettingsStore.getState().setVoice(voiceOption);
   };
 
   if (!sessionId || segments.length === 0) {
@@ -91,7 +101,7 @@ export default function PracticeSessionPage() {
 
           {/* Settings row */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <PlaybackSpeed value={playbackSpeed} onChange={setPlaybackSpeed} />
+            <PlaybackSpeed value={playbackSpeed} onChange={handleSpeedChange} />
             <VoiceSelector
               value={selectedVoice}
               onChange={handleVoiceChange}

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { render } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import PracticeSessionPage from "@/app/practice/session/page";
 import { usePracticeStore } from "@/stores/practice-store";
+import { useSettingsStore } from "@/stores/settings-store";
 import { useSettingsSync } from "@/lib/hooks/use-settings-sync";
 
 // Mock Next.js navigation
@@ -11,11 +12,27 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+const mockSetPlaybackSpeed = vi.fn();
+const mockSetSpeed = vi.fn();
+const mockSetVoicePractice = vi.fn();
+const mockSetVoiceSettings = vi.fn();
+
 // Mock the practice store
 vi.mock("@/stores/practice-store", () => ({
   usePracticeStore: Object.assign(vi.fn(), {
     getState: vi.fn(() => ({
-      setVoice: vi.fn(),
+      setVoice: mockSetVoicePractice,
+      setPlaybackSpeed: mockSetPlaybackSpeed,
+    })),
+  }),
+}));
+
+// Mock the settings store
+vi.mock("@/stores/settings-store", () => ({
+  useSettingsStore: Object.assign(vi.fn(), {
+    getState: vi.fn(() => ({
+      setSpeed: mockSetSpeed,
+      setVoice: mockSetVoiceSettings,
     })),
   }),
 }));
@@ -29,8 +46,20 @@ vi.mock("@/lib/hooks/use-settings-sync", () => ({
 vi.mock("@/components/practice", () => ({
   AudioPlayer: () => <div data-testid="audio-player">Audio Player</div>,
   SegmentList: () => <div data-testid="segment-list">Segment List</div>,
-  PlaybackSpeed: () => <div data-testid="playback-speed">Playback Speed</div>,
-  VoiceSelector: () => <div data-testid="voice-selector">Voice Selector</div>,
+  PlaybackSpeed: ({ onChange }: { onChange: (speed: number) => void }) => (
+    <div data-testid="playback-speed">
+      <button data-testid="speed-button" onClick={() => onChange(1.5)}>
+        1.5x
+      </button>
+    </div>
+  ),
+  VoiceSelector: ({ onChange }: { onChange: (voice: string) => void }) => (
+    <div data-testid="voice-selector">
+      <button data-testid="voice-button" onClick={() => onChange("alloy")}>
+        Alloy
+      </button>
+    </div>
+  ),
 }));
 
 const mockUsePracticeStore = usePracticeStore as unknown as Mock;
@@ -90,6 +119,34 @@ describe("PracticeSessionPage", () => {
 
       expect(document.querySelector("[data-testid='audio-player']")).toBeInTheDocument();
       expect(document.querySelector("[data-testid='segment-list']")).toBeInTheDocument();
+    });
+  });
+
+  describe("SPEC-REPEAT-001-FIX: settings change synchronization", () => {
+    it("should update both practice-store and settings-store when speed changes", () => {
+      render(<PracticeSessionPage />);
+
+      const speedButton = document.querySelector("[data-testid='speed-button']");
+      expect(speedButton).toBeInTheDocument();
+
+      fireEvent.click(speedButton!);
+
+      // Both stores should be updated
+      expect(mockSetPlaybackSpeed).toHaveBeenCalledWith(1.5);
+      expect(mockSetSpeed).toHaveBeenCalledWith(1.5);
+    });
+
+    it("should update both practice-store and settings-store when voice changes", () => {
+      render(<PracticeSessionPage />);
+
+      const voiceButton = document.querySelector("[data-testid='voice-button']");
+      expect(voiceButton).toBeInTheDocument();
+
+      fireEvent.click(voiceButton!);
+
+      // Both stores should be updated
+      expect(mockSetVoicePractice).toHaveBeenCalledWith("alloy");
+      expect(mockSetVoiceSettings).toHaveBeenCalledWith("alloy");
     });
   });
 });

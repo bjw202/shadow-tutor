@@ -57,6 +57,9 @@ export function usePlaybackMode(): UsePlaybackModeReturn {
     // Reset pause state
     state.skipPause();
 
+    // SPEC-REPEAT-001-FIX: Both modes respect repeatCount setting
+    // newRepeatCount starts at 1 (since currentRepeat starts at 0)
+    // For repeatCount=N: plays N times (repeats N-1 times after first play)
     if (newRepeatCount < state.shadowingSettings.repeatCount) {
       // More repeats needed
       state.incrementRepeat();
@@ -65,7 +68,9 @@ export function usePlaybackMode(): UsePlaybackModeReturn {
       // All repeats done
       state.resetRepeat();
 
-      if (state.shadowingSettings.autoAdvance) {
+      // Continuous mode: always advance after all repeats
+      // Shadowing mode: only advance if autoAdvance is enabled
+      if (state.mode === "continuous" || state.shadowingSettings.autoAdvance) {
         callbacksRef.current.onAdvance?.();
       }
     }
@@ -105,15 +110,13 @@ export function usePlaybackMode(): UsePlaybackModeReturn {
     (onAdvance: () => void, onRepeat?: () => void) => {
       const state = usePracticeStore.getState();
 
-      if (state.mode === "continuous") {
-        // In continuous mode, advance immediately
-        onAdvance();
-        return;
-      }
-
-      // In shadowing mode, start pause
+      // Store callbacks for pause/repeat logic
       callbacksRef.current.onAdvance = onAdvance;
       callbacksRef.current.onRepeat = onRepeat || null;
+
+      // Both modes now use pause for repeat control
+      // The difference is: continuous advances immediately after all repeats,
+      // shadowing waits for user (via pause) before advancing
       state.startPause();
     },
     []
@@ -127,6 +130,9 @@ export function usePlaybackMode(): UsePlaybackModeReturn {
     // Reset pause state
     state.skipPause();
 
+    // SPEC-REPEAT-001-FIX: Both modes respect repeatCount setting
+    // newRepeatCount starts at 1 (since currentRepeat starts at 0)
+    // For repeatCount=N: plays N times (repeats N-1 times after first play)
     if (newRepeatCount < state.shadowingSettings.repeatCount) {
       // More repeats needed
       state.incrementRepeat();
@@ -135,7 +141,9 @@ export function usePlaybackMode(): UsePlaybackModeReturn {
       // All repeats done
       state.resetRepeat();
 
-      if (state.shadowingSettings.autoAdvance) {
+      // Continuous mode: always advance after all repeats
+      // Shadowing mode: only advance if autoAdvance is enabled
+      if (state.mode === "continuous" || state.shadowingSettings.autoAdvance) {
         callbacksRef.current.onAdvance?.();
       }
     }
