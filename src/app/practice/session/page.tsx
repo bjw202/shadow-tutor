@@ -12,10 +12,15 @@ import {
   VoiceSelector,
 } from "@/components/practice";
 import { usePracticeStore } from "@/stores/practice-store";
+import { useSettingsSync } from "@/lib/hooks/use-settings-sync";
 import type { VoiceOption } from "@/types";
 
 export default function PracticeSessionPage() {
   const router = useRouter();
+
+  // Sync settings from settings-store to practice-store on mount
+  useSettingsSync();
+
   const {
     segments,
     sessionId,
